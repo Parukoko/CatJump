@@ -6,7 +6,7 @@ bool Game::compareScores(const ScoreEntry& a, const ScoreEntry& b)
     return a.score > b.score;
 }
 
-void Game::loadfile_andsort(int scorePlay) {
+void Game::loadfile_andsort(std::string& playerName, int scorePlay) {
     std::ifstream inputFile("point.txt");
 
     if (!inputFile.is_open()) {
@@ -19,7 +19,7 @@ void Game::loadfile_andsort(int scorePlay) {
 
     while (inputFile >> name >> scorePlay) {
         ScoreEntry entry;
-        entry.name = name;
+        entry.name = playerName;
         entry.score = scorePlay;
         scoreEntries.push_back(entry);
     }
@@ -32,7 +32,7 @@ void Game::loadfile_andsort(int scorePlay) {
     std::string topNames[numTopScores];
     int topScores[numTopScores];
 
-    std::cout << "Top 5 Scores:\n";
+    std::cout << "Top 5 Scores: \n";
     for (int i = 0; i < numTopScores && i < scoreEntries.size(); ++i) {
         topNames[i] = scoreEntries[i].name;
         topScores[i] = scoreEntries[i].score;
@@ -44,7 +44,7 @@ void Game::loadfile_andsort(int scorePlay) {
 
     for (int i = 0; i < numTopScores && i < scoreEntries.size(); ++i) {
         sf::Font font;
-        top5[i].setFont(font); // Use the appropriate font
+        top5[i].setFont(font);
         top5[i].setFillColor(sf::Color(140, 109, 76));
         top5[i].setString(topNames[i]);
         top5[i].setPosition(65, 590 + (50 * i));
@@ -52,7 +52,7 @@ void Game::loadfile_andsort(int scorePlay) {
         sf::Text scoreText;
         scoreText.setFont(font); // Use the appropriate font
         scoreText.setFillColor(sf::Color(140, 109, 76));
-        scoreText.setString(std::to_string(topScores[i])); // Convert int to string
+        scoreText.setString(std::to_string(topScores[i]));
         scoreText.setPosition(335, 590 + (50 * i));
         name5[i] = scoreText;
     }

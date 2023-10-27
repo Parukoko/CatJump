@@ -16,5 +16,5 @@ class Game {
 public:
     static bool compareScores(const ScoreEntry& a, const ScoreEntry& b);
 
-    static void loadfile_andsort(int scorePlay);
+    static void loadfile_andsort(std::string& playerName, int scorePlay);
 };

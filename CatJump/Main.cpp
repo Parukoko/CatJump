@@ -72,8 +72,9 @@ int main()
 	ScoreBoard Scoreboard;
 
 	Name name;
+	Name playerNameObject;
 
-	Player player(&playerTexture, sf::Vector2u(4, 2), 0.3f, 100.0f, 250);
+	Player player(&playerTexture, sf::Vector2u(4, 2), 0.5f, 100.0f, 250);
 
 	const int numRandomPositions = 10;
 
@@ -83,6 +84,7 @@ int main()
 	std::vector<sf::Vector2f> randomCoinPositions;
 	std::vector<Name> scoreboard;
 	std::vector<Name>& names = Scoreboard.GetName();
+	std::vector<Coin> collectedCoins;
 
 	std::srand(static_cast<unsigned>(std::time(nullptr)));
 
@@ -241,32 +243,23 @@ int main()
 				}
 
 				//coin
-				std::vector<Coin> collectedCoins;
 
 				for (Coin& coin : coins) {
 					coin.Draw(window);
 				}
 
-				coins.erase(std::remove_if(coins.begin(), coins.end(), [&player](const Coin& coin) {
+				coins.erase(std::remove_if(coins.begin(), coins.end(), [&player, &collectedCoins](Coin& coin) {
 					if (coin.GetGlobalBounds().intersects(player.GetCollider().GetGlobalBounds())) {
 						collectedCoins.push_back(coin);
-						return true; // Remove the coin
+						return true;
 					}
-					return false; // Keep the coin
-					}), coins.end());
+					return false;
+				}), coins.end());
 
 				if (collectedCoins.size() == 10) {
 					survivalTime.Stop();
 					playing = false;
 					enterPressed = true;
-					break;
-					/*
-						ScoreboardText.setString("Score: " + std::to_string(static_cast<int>(survivalTime.GetTotalTime())));
-						ScoreboardText.setPosition(100.0f, 100.0f);
-						ScoreboardText.setFillColor(sf::Color::White);
-						ScoreboardText.setFont(font);
-						ScoreboardText.setCharacterSize(40);
-						window.draw(ScoreboardText);*/
 				}
 
 				//Timer
@@ -275,8 +268,8 @@ int main()
 				}
 				else {
 					survivalTime.Stop();
-					
-					return 0;
+					playing = false;
+					enterPressed = true;
 				}
 				gameTime.Reset();
 				gameTime.Start();
@@ -302,13 +295,7 @@ int main()
 
 			}
 			case 1:
-				name.SetName("Player Name");
-				name.SetScore(1000);
-				Scoreboard.AddName(name);
-				for (Name& name : names) {
-					std::cout << "Name: " << name.GetName();
-				}
-				Game::loadfile_andsort(static_cast<int>(survivalTime.GetTotalTime()));
+				Game::loadfile_andsort(playerName, static_cast<int>(survivalTime.GetTotalTime()));
 				break;
 			case 2:
 				window.close();
