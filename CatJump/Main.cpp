@@ -12,7 +12,6 @@
 #include "ScoreBoard.h"
 #include "Name.h"
 #include "Game.h"
-#include "Gamestate.h"
 #include <stdio.h>
 #include <ctime>
 #include <cstdlib>
