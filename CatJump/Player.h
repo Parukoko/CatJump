@@ -17,6 +17,8 @@ public:
 	Collider GetCollider() { return Collider(body); }
 
 	void DecreaseHealth(int amount);
+	void setPosition(sf::Vector2f position);
+	void reset();
 	int GetHealth();
 
 private:

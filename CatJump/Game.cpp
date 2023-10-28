@@ -6,7 +6,13 @@ bool Game::compareScores(const ScoreEntry& a, const ScoreEntry& b)
     return a.score > b.score;
 }
 
-void Game::loadfile_andsort(std::string& playerName, int scorePlay) {
+void Game::save_score(std::string& playerName, int scorePlay) {
+    std::ofstream outputFile("point.txt", std::ios::app);
+    outputFile << playerName << ' ' << scorePlay;
+    outputFile.close();
+}
+
+void Game::loadfile_andsort(sf::RenderWindow* window) {
     std::ifstream inputFile("point.txt");
 
     if (!inputFile.is_open()) {
@@ -17,7 +23,10 @@ void Game::loadfile_andsort(std::string& playerName, int scorePlay) {
     std::vector<ScoreEntry> scoreEntries;
     std::string name;
 
-    while (inputFile >> name >> scorePlay) {
+    std::string playerName;
+    int scorePlay;
+
+    while (inputFile >> playerName >> scorePlay) {
         ScoreEntry entry;
         entry.name = playerName;
         entry.score = scorePlay;
@@ -42,18 +51,20 @@ void Game::loadfile_andsort(std::string& playerName, int scorePlay) {
     sf::Text top5[numTopScores];
     sf::Text name5[numTopScores];
 
+    sf::Font font;
+    font.loadFromFile("LongDrive.ttf");
+
     for (int i = 0; i < numTopScores && i < scoreEntries.size(); ++i) {
-        sf::Font font;
         top5[i].setFont(font);
         top5[i].setFillColor(sf::Color(140, 109, 76));
         top5[i].setString(topNames[i]);
         top5[i].setPosition(65, 590 + (50 * i));
+        window->draw(top5[i]);
 
-        sf::Text scoreText;
-        scoreText.setFont(font); // Use the appropriate font
-        scoreText.setFillColor(sf::Color(140, 109, 76));
-        scoreText.setString(std::to_string(topScores[i]));
-        scoreText.setPosition(335, 590 + (50 * i));
-        name5[i] = scoreText;
+        name5[i].setFont(font); // Use the appropriate font
+        name5[i].setFillColor(sf::Color(140, 109, 76));
+        name5[i].setString(std::to_string(topScores[i]));
+        name5[i].setPosition(335, 590 + (50 * i));
+        window->draw(name5[i]);
     }
 }

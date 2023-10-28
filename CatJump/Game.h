@@ -15,6 +15,6 @@ struct ScoreEntry {
 class Game {
 public:
     static bool compareScores(const ScoreEntry& a, const ScoreEntry& b);
-
-    static void loadfile_andsort(std::string& playerName, int scorePlay);
+    static void save_score(std::string& playerName, int scorePlay);
+    static void loadfile_andsort(sf::RenderWindow* window);
 };

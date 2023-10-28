@@ -11,7 +11,7 @@ public:
     sf::Vector2f GetPosition() { return body.getPosition(); }
     sf::FloatRect GetGlobalBounds() { return body.getGlobalBounds(); }
     static Coin coinarr[36];
-    void ResetPosition() {
+    void ResetPosition(sf::Vector2f(initialPosition)) {
         body.setPosition(initialPosition);
     }
 private:

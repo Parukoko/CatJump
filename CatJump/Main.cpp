@@ -3,7 +3,7 @@
 #include <vector>
 #include <cmath>
 #include "Animation.h"
-#include "Player.h"
+#include "Player.h"  
 #include "Platform.h"
 #include "Enemy.h"
 #include "Coin.h"
@@ -27,13 +27,6 @@ void ResizeView(const sf::RenderWindow& window, sf::View& view)
 std::string InputPlayerName(sf::RenderWindow& window)
 {
 	std::string playerName;
-	sf::Font font;
-	sf::Text nameText;
-	nameText.setFont(font);
-	nameText.setCharacterSize(24);
-	nameText.setFillColor(sf::Color::White);
-	nameText.setPosition(window.getSize().x / 2, window.getSize().y / 3);
-
 	bool enteringName = true;
 	sf::Event nameEntryEvent;
 	while (window.isOpen() && enteringName) {
@@ -52,7 +45,6 @@ std::string InputPlayerName(sf::RenderWindow& window)
 			}
 
 			window.clear(sf::Color::Black);
-			window.draw(nameText);
 			window.display();
 		}
 	}
@@ -69,10 +61,8 @@ int main()
 	coinTexture.loadFromFile("coin10101.png");
 
 	ScoreBoard Scoreboard;
-
 	Name name;
 	Name playerNameObject;
-
 	Player player(&playerTexture, sf::Vector2u(4, 2), 0.5f, 100.0f, 250);
 
 	const int numRandomPositions = 10;
@@ -82,7 +72,7 @@ int main()
 	std::vector<Coin> coins;
 	std::vector<sf::Vector2f> randomCoinPositions;
 	std::vector<Name> scoreboard;
-	std::vector<Name>& names = Scoreboard.GetName();
+	//std::vector<Name>& names = Scoreboard.GetName();
 	std::vector<Coin> collectedCoins;
 
 	std::srand(static_cast<unsigned>(std::time(nullptr)));
@@ -97,6 +87,7 @@ int main()
 	for (const sf::Vector2f& position : randomCoinPositions) {
 		coins.push_back(Coin(&coinTexture, sf::Vector2u(1, 1), 0.3f, position));
 	}
+
 	for (int i = 0; i < 9; i++) {
 		float x = 50.0f + (300.0f * i);
 		for (int j = 0; j < 3; j++) {
@@ -113,7 +104,6 @@ int main()
 
 	platforms.push_back(Platform(nullptr, sf::Vector2f(2000.0f, 50.0f), sf::Vector2f(900.0f, 900.0f)));
 
-
 	Timer gameTime;
 	Timer survivalTime;
 
@@ -129,7 +119,6 @@ int main()
 	sf::Text gameText;
 	sf::Text survivalText;
 	sf::Text ScoreboardText;
-	sf::Text nameText;
 	std::string playerName;
 
 	font.loadFromFile("LongDrive.ttf");
@@ -139,9 +128,17 @@ int main()
 	playerNameText.setCharacterSize(24);
 	playerNameText.setFillColor(sf::Color::White);
 
+	sf::Text gameOverText;
+	gameOverText.setFont(font);
+	gameOverText.setCharacterSize(60);
+	gameOverText.setFillColor(sf::Color::Red);
+	gameOverText.setString("GAME OVER");
+	gameOverText.setPosition(window.getSize().x / 2 - 150, window.getSize().y / 2);
+
 	bool nameEntered = false;
 	bool enteringName = false;
 	bool playing = false;
+	bool gameOver = false;
 
 	while (window.isOpen())
 	{
@@ -173,11 +170,14 @@ int main()
 				}
 				break;
 			case sf::Event::TextEntered:
-				if (evnt.text.unicode == '\b' && playerName.size() > 0) {
-					playerName.pop_back();
-				}
-				else if (evnt.text.unicode < 128) {
-					playerName += static_cast<char>(evnt.text.unicode);
+				if (enteringName)
+				{
+					if (evnt.text.unicode == '\b' && playerName.size() > 0) {
+						playerName.pop_back();
+					}
+					else if (evnt.text.unicode > 32 && evnt.text.unicode < 128) {
+						playerName += static_cast<char>(evnt.text.unicode);
+					}
 				}
 				break;
 			case sf::Event::Closed:
@@ -185,6 +185,8 @@ int main()
 				break;
 			case sf::Event::Resized:
 				ResizeView(window, view);
+				break;
+			default:
 				break;
 			}
 		}
@@ -242,7 +244,6 @@ int main()
 				}
 
 				//coin
-
 				for (Coin& coin : coins) {
 					coin.Draw(window);
 				}
@@ -259,20 +260,46 @@ int main()
 					survivalTime.Stop();
 					playing = false;
 					enterPressed = true;
+					Game::save_score(playerName, static_cast<int>(survivalTime.GetTotalTime()));
 				}
 
 				//Timer
 				if (player.GetHealth() > 0) {
 					survivalTime.Start();
-				}
+				} 
 				else {
-					survivalTime.Stop();
-					playing = false;
-					enterPressed = true;
+					if (!gameOver) {
+						gameOver = true;
+						player.setPosition(sf::Vector2f(100.0f, 0.0f));
+						survivalTime.Stop();
+						for (int i = 0; i < numRandomPositions; i++) {
+							float randomX = static_cast<float>(std::rand() % window.getSize().x);
+							float randomY = static_cast<float>(std::rand() % window.getSize().y);
+							randomCoinPositions.push_back(sf::Vector2f(randomX, randomY));
+						}
+
+						for (const sf::Vector2f& position : randomCoinPositions) {
+							coins.push_back(Coin(&coinTexture, sf::Vector2u(1, 1), 0.3f, position));
+						}
+					}
+					window.clear();
+					for (Coin& coin : coins) {
+						coin.Draw(window);
+					}
+					window.draw(gameOverText);
+
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+						player.reset();  
+						survivalTime.Reset();
+						collectedCoins.clear();
+						gameOver = false;
+					}
+					for (Platform& platform : platforms)
+						platform.Draw(window);
+
 				}
 				gameTime.Reset();
 				gameTime.Start();
-
 				player.Draw(window);
 
 				gameText.setString("Health: " + std::to_string(static_cast<int>(player.GetHealth())));
@@ -288,13 +315,11 @@ int main()
 				survivalText.setFont(font);
 				survivalText.setCharacterSize(40);
 				window.draw(survivalText);
-
-				printf("%d\n", (int)player.GetPosition().x);
 				break;
 
 			}
 			case 1:
-				Game::loadfile_andsort(playerName, static_cast<int>(survivalTime.GetTotalTime()));
+				Game::loadfile_andsort(&window);
 				break;
 			case 2:
 				window.close();

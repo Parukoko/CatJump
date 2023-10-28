@@ -1,7 +1,6 @@
 #include "Player.h"
 #include "Animation.h"
 #include "Collider.h"
-#include "crouchingAnimation.h"
 #include <SFML/Graphics.hpp>
 
 
@@ -100,4 +99,15 @@ void Player::DecreaseHealth(int amount)
 
 int Player::GetHealth(){
 	return this->health;
+}
+
+void Player::setPosition(sf::Vector2f position) {
+	body.setPosition(position);
+}
+
+void Player::reset() {
+	body.setPosition(450.0f, 200.0f);
+	Velocity = sf::Vector2f(0.0f, 0.0f);
+	canJump = true;
+	health = 5;
 }
