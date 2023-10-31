@@ -3,7 +3,7 @@
 
 bool Game::compareScores(const ScoreEntry& a, const ScoreEntry& b)
 {
-    return a.score > b.score;
+    return a.score < b.score;
 }
 
 void Game::save_score(std::string& playerName, int scorePlay) {

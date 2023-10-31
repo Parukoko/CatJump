@@ -135,6 +135,13 @@ int main()
 	gameOverText.setString("GAME OVER");
 	gameOverText.setPosition(window.getSize().x / 2 - 150, window.getSize().y / 2);
 
+	sf::Text NameText;
+	NameText.setFont(font);
+	NameText.setCharacterSize(30);
+	NameText.setFillColor(sf::Color::White);
+	NameText.setString("Thanatchaya Toom-ariya 66010345");
+	NameText.setPosition(window.getSize().x - 400, window.getSize().y - 50);
+
 	bool nameEntered = false;
 	bool enteringName = false;
 	bool playing = false;
@@ -193,6 +200,7 @@ int main()
 
 		if (!playing) {
 			menu.draw(window);
+			window.draw(NameText);
 		}
 
 		if (playing) {
@@ -328,6 +336,7 @@ int main()
 		}
 
 		view.setCenter(player.GetPosition());
+
 
 		if (enteringName) {
 			window.draw(playerNameText);
